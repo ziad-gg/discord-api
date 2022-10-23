@@ -1,5 +1,4 @@
-import { getRPSChoices } from "./game.js";
-import { capitalize, DiscordAPI } from "./utils.js";
+import { DiscordAPI } from "./utils.js";
 
 export async function InstallGuildCommand(client, appId, guildId, command) {
     const url = DiscordAPI(`applications/${appId}/guilds/${guildId}/commands`);
