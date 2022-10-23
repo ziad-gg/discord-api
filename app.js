@@ -46,6 +46,13 @@ app.post('/interactions', async function (req, res) {
         method: "PATCH",
         data: {content}
        })
+     },
+     followUp: async function(content) {
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}`),
+        method: "POST",
+        data: {content}
+       })
      }
    }
    command.run(interaction, InteractionResponseType)

@@ -1,7 +1,8 @@
 module.exports.run = async function(interaction) {
          
  interaction.reply("pong 🏓")
-  interaction.delete()
+  interaction.edit("pongeee");
+  interaction.followUp("worked")
 }
 
 module.exports.data = {
