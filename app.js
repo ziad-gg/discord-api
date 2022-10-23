@@ -26,7 +26,12 @@ app.post('/interactions', async function (req, res) {
     const { name } = data;  
     const command = await commands.get(name);
     if (!command) return;
-    
+  
+   const interaction = {
+     reply: async function(content) {
+       
+     }
+   }
    command.run(res, InteractionResponseType)
 });
 
