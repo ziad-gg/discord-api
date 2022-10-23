@@ -6,7 +6,7 @@ const { TEST_COMMAND, InstallGuildCommand } = require('./commands.js');
 const { readFileSync, readdirSync } = require('node:fs');
 
 const app = express();
-app.use(express.json({verify: VerifyDiscordRequest(process.env.PUBLIC_KEY)}));
+//app.use(express.json({verify: VerifyDiscordRequest(process.env.PUBLIC_KEY)}));
 
 const client = axios.create({
     headers: {'Authorization': `Bot ${process.env.DISCORD_TOKEN}`}
@@ -17,7 +17,7 @@ const commands = new Map();
 for (let file of readdirSync("commands")) {
    const command = require("./commands/"+file);
    commands.set(command.data.name, command);
-   InstallGuildCommand(client, "1031396629070225438", "988515701318901770", command.data)
+   InstallGuildCommand(client, process.env.APP_ID, command.data)
 }
 
 
@@ -31,5 +31,6 @@ app.post('/interactions', async function (req, res) {
 });
 
 app.listen(3000, async() => {
-    console.log('Listening on port 3000');
+  const { data } = await client({url: DiscordAPI("/users/@me"), method: "GET"});
+  console.log(`${data.username} bot is ready`);
 });
