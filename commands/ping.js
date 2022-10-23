@@ -1,10 +1,6 @@
-module.exports.run = async function(res, InteractionResponseType) {
+module.exports.run = async function(interaction) {
          
-       res.send({ 
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {"content": "pong"}
-         });
- 
+ interaction.reply("pong 🏓")
 }
 
 module.exports.data = {

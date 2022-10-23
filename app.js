@@ -29,10 +29,16 @@ app.post('/interactions', async function (req, res) {
   
    const interaction = {
      reply: async function(content) {
-       
+         res.send({ 
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {"content": content}
+         });
+     },
+     delete: async function() {
+     
      }
    }
-   command.run(res, InteractionResponseType)
+   command.run(interaction, InteractionResponseType)
 });
 
 app.listen(3000, async() => {
