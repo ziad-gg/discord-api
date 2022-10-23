@@ -26,6 +26,7 @@ app.post('/interactions', async function (req, res) {
     const { name } = data;  
     const command = await commands.get(name);
     if (!command) return;
+  console.log(req.body)
   
    const interaction = {
      reply: async function(content) {
@@ -61,4 +62,4 @@ app.post('/interactions', async function (req, res) {
 app.listen(3000, async() => {
   const { data } = await client({url: DiscordAPI("/users/@me"), method: "GET"});
   console.log(`${data.username} bot is ready`);
-})
+});
