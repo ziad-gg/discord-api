@@ -28,7 +28,7 @@ app.post('/interactions', async function (req, res) {
     const command = await commands.get(name);
     if (!command) return;
   
-  const interactionClassAPI = new messageAPI(req.body, req, res)  
+  const interactionClassAPI = new messageAPI(await req.body, res,  req)  
    const interaction = {
      reply: async function(content) {
          res.send({ 
@@ -58,7 +58,7 @@ app.post('/interactions', async function (req, res) {
      }
    }
    
-   command.run(interaction, InteractionResponseType)
+   command.run(interactionClassAPI, InteractionResponseType)
 });
 
 app.listen(3000, async() => {
