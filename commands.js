@@ -1,11 +1,11 @@
-import { DiscordAPI } from "./utils.js";
+const { DiscordAPI } = require("./utils.js");
 
-export async function InstallGuildCommand(client, appId, guildId, command) {
+module.exports.InstallGuildCommand = async function (client, appId, guildId, command) {
     const url = DiscordAPI(`applications/${appId}/guilds/${guildId}/commands`);
     return client({ url, method: 'post', data: command});
 }
 
-export const TEST_COMMAND = {
+module.exports.TEST_COMMAND =  {
     "name": "test",
     "description": "Basic guild command",
     "type": 1
