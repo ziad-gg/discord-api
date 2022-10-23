@@ -8,18 +8,20 @@ const client = axios.create({
 
 class interactionsEvent {
   constructor(interaction, res, req) {
+    this.interaction = interaction
     this.req = req;
     this.res = res;
-    this.token = interaction.token
-    this.applicationId = interaction.application_id;
+    this.token = req.body.token
+    this.applicationId = req.body.application_id;
     this.channelid = interaction.channel_id;
+    console.log(this.applicationId)
     this.user = {
-      id:  interaction.user.id,
-      discriminator: interaction.user.discriminator,
-      username: interaction.user.username,
-      roles: interaction.roles,
-      avatar: interaction.user.avatar,
-      joinedAt: interaction.user.joined_at,
+      id:  interaction.member.user.id,
+      discriminator: interaction.member.user.discriminator,
+      username: interaction.member.user.username,
+      roles: interaction.member.roles,
+      avatar: interaction.member.user.avatar,
+      joinedAt: interaction.member.user.joined_at,
     };
     this.guild = {
       id: interaction.guild_id,
@@ -32,7 +34,7 @@ class interactionsEvent {
   };
   
   async reply(options) {
-      return this.res.send({ 
+       this.res.send({ 
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: options
       });

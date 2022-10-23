@@ -14,7 +14,6 @@ const client = axios.create({
 });  
 
 const commands = new Map();
-console.log(messageAPI)
 for (let file of readdirSync("commands")) {
    const command = require("./commands/"+file);
    commands.set(command.data.name, command);
@@ -22,13 +21,44 @@ for (let file of readdirSync("commands")) {
 }
 
 
+
 app.post('/interactions', async function (req, res) {
     const { type, id, data } = req.body;
     const { name } = data;  
     const command = await commands.get(name);
     if (!command) return;
-    console.log(req.body)
-  // command.run(new messageAPI(req.body, res, req), InteractionResponseType)
+  
+  const interactionClassAPI = new messageAPI(req.body, req, res)  
+   const interaction = {
+     reply: async function(content) {
+         res.send({ 
+          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+          data: {"content": content}
+         });
+     },
+     delete: async function() {
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
+        method: "DELETE"
+       })
+     },
+     edit: async function(content) {
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
+        method: "PATCH",
+        data: {content}
+       })
+     },
+     followUp: async function(content) {
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}`),
+        method: "POST",
+        data: {content}
+       })
+     }
+   }
+   
+   command.run(interaction, InteractionResponseType)
 });
 
 app.listen(3000, async() => {
@@ -37,31 +67,3 @@ app.listen(3000, async() => {
 });
 
   
-   // const interaction = {
-   //   reply: async function(content) {
-   //       res.send({ 
-   //        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-   //        data: {"content": content}
-   //       });
-   //   },
-   //   delete: async function() {
-   //     client({
-   //      url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
-   //      method: "DELETE"
-   //     })
-   //   },
-   //   edit: async function(content) {
-   //     client({
-   //      url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
-   //      method: "PATCH",
-   //      data: {content}
-   //     })
-   //   },
-   //   followUp: async function(content) {
-   //     client({
-   //      url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}`),
-   //      method: "POST",
-   //      data: {content}
-   //     })
-   //   }
-   // }
