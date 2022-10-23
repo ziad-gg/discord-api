@@ -1,10 +1,15 @@
-
 const axios = require('axios');
 const { InteractionType, InteractionResponseType } = require('discord-interactions');
-const { VerifyDiscordRequest, DiscordAPI } = require('./utils.js');
-class interactionApi {
-  constructor(interaction) {
-    
+const { VerifyDiscordRequest, DiscordAPI } = require('../utils.js');
+
+const client = axios.create({
+    headers: {'Authorization': `Bot ${process.env.DISCORD_TOKEN}`}
+});  
+
+class interactionsEvent {
+  constructor(interaction, res, req) {
+    this.req = req;
+    this.res = res;
     this.token = interaction.token
     this.applicationId = interaction.application_id;
     this.channelid = interaction.channel_id;
@@ -26,11 +31,38 @@ class interactionApi {
     }
   };
   
-  reply(options) {
-    
+  async reply(options) {
+      return this.res.send({ 
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: options
+      });
+  };
+  
+  delete() {
+   return client({
+        url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}/messages/@original`),
+        method: "DELETE"
+      });
+  };
+  
+ edit(options) {
+   return client({
+        url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}/messages/@original`),
+        method: "PATCH",
+        data: options
+      });
+  };
+  
+  followUp(options) {
+   return client({
+        url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}`),
+        method: "POST",
+        data: options
+      });
   };
 }
 
+module.exports = interactionsEvent
 
 // {
 //   app_permissions: '4398046511103',

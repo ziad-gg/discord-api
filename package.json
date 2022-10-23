@@ -1,12 +1,11 @@
 {
-  "name": "discord-getting-started",
+  "name": "discor-api",
   "version": "1.0.0",
-  "description": "Basic Discord app using interactions",
+  "description": "discor api",
   "main": "app.js",
   "scripts": {
     "start": "node app.js"
   },
-  "author": "Shay DeWael",
   "license": "MIT",
   "engines": {
     "node": "16.x"
