@@ -35,7 +35,17 @@ app.post('/interactions', async function (req, res) {
          });
      },
      delete: async function() {
-     
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
+        method: "DELETE"
+       })
+     },
+     edit: async function(content) {
+       client({
+        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
+        method: "PATCH",
+        data: {content}
+       })
      }
    }
    command.run(interaction, InteractionResponseType)
