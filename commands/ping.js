@@ -1,8 +1,6 @@
 module.exports.run = async function(interaction) {
          
- interaction.reply({content: "pong 🏓"});
- const user = await interaction.guild.members
- console.log(user)
+ interaction.reply({content: `pong`});
 
 }
 

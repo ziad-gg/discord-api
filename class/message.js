@@ -10,16 +10,19 @@ class interactionsEvent {
   constructor(interaction, res, req) {
     
     this.cache = new Map();
-    
     async function logUsers(cache) {
-      client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {data.forEach(async user => cache.set(user.user.id, user));});
-      return cache
+      await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {data.forEach(async user => cache.set(user.user.id, user));});
+      return await cache
     }
-    
     this.response = res
     this.token = interaction.token
     this.applicationId = interaction.application_id;
-    this.channelid = interaction.channel_id;
+    this.channel = {
+      id: interaction.channel_id,
+      delete: async => client({url: DiscordAPI(`/channels/${interaction.channel_id}`), method: "DELETE"}),
+      send: async (data) => client({url: DiscordAPI(`/channels/${interaction.channel_id}/messages`), method: "POST", data}),
+      bulkDelete: async (amount) => client({url: DiscordAPI(`/channels/${interaction.channel_id}/bulk-delete`), method: "POST", data: {messages: amount}}),
+    };
     this.user = {
       id:  interaction.member.user.id,
       discriminator: interaction.member.user.discriminator,
@@ -27,6 +30,7 @@ class interactionsEvent {
       roles: interaction.member.roles,
       avatar: interaction.member.user.avatar,
       joinedAt: interaction.member.user.joined_at,
+      avatarURL: async () => `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png?size=1024`
     };
     this.guild = {  
       id: interaction.guild_id,
