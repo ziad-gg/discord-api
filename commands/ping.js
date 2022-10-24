@@ -1,8 +1,9 @@
 module.exports.run = async function(interaction) {
          
- interaction.reply({content: "pong 🏓"})
- // interaction.edit("pongeee");
-  interaction.delete()
+ interaction.reply({content: "pong 🏓"});
+ console.log(interaction.guild.members())
+ // interaction.followUp({content: "pongeee"});
+
 }
 
 module.exports.data = {

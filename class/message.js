@@ -8,10 +8,10 @@ const client = axios.create({
 
 class interactionsEvent {
   constructor(interaction, res, req) {
-//    console.log()
+    
     this.response = res
-    this.token = interaction.token.token
-    this.applicationId = interaction.token.application_id;
+    this.token = interaction.token
+    this.applicationId = interaction.application_id;
     this.channelid = interaction.channel_id;
     this.user = {
       id:  interaction.member.user.id,
@@ -23,6 +23,15 @@ class interactionsEvent {
     };
     this.guild = {
       id: interaction.guild_id,
+      members: async function() {
+       const users = await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET"});
+        const cache = new Map();
+        users.data
+        users.data.forEach(user => {
+          cache.set(user.id, user)
+        })
+        return cache
+      }
     };
     this.command = {
       name: interaction.data.name,
@@ -39,14 +48,14 @@ class interactionsEvent {
   };
   
   delete() {
-   return client({
+    client({
         url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}/messages/@original`),
         method: "DELETE"
       });
   };
   
  edit(options) {
-   return client({
+    client({
         url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}/messages/@original`),
         method: "PATCH",
         data: options
@@ -54,7 +63,7 @@ class interactionsEvent {
   };
   
   followUp(options) {
-   return client({
+    client({
         url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}`),
         method: "POST",
         data: options
@@ -63,45 +72,3 @@ class interactionsEvent {
 }
 
 module.exports = interactionsEvent
-
-// {
-//   app_permissions: '4398046511103',
-//   application_id: '1031396629070225438',
-//   channel_id: '999567239386763264',
-//   data: {
-//     guild_id: '988515701318901770',
-//     id: '1033734774466027572',
-//     name: 'ping',
-//     type: 1
-//   },
-//   entitlement_sku_ids: [],
-//   guild_id: '988515701318901770',
-//   guild_locale: 'en-US',
-//   id: '1033871469802963036',
-//   locale: 'en-US',
-//   member: {
-//     avatar: null,
-//     communication_disabled_until: null,
-//     deaf: false,
-//     flags: 0,
-//     is_pending: false,
-//     joined_at: '2022-06-20T18:48:28.981000+00:00',
-//     mute: false,
-//     nick: null,
-//     pending: false,
-//     permissions: '4398046511103',
-//     premium_since: null,
-//     roles: [],
-//     user: {
-//       avatar: '5d2506644d459d9bdf75905d80a44da2',
-//       avatar_decoration: null,
-//       discriminator: '1768',
-//       id: '860865950945378325',
-//       public_flags: 128,
-//       username: 'Ziath'
-//     }
-//   },
-//   token: 'aW50ZXJhY3Rpb246MTAzMzg3MTQ2OTgwMjk2MzAzNjpJZ2dqNmJ4ZndYa3RYb2VNUERxTVFYS01QSGFYQ3VWQ3o2Tkx3Q1l1VU9GQUowUWZrbXZEUXV0THkwRzI4ZVJPZFdMaTlIZFlva3dvZlNYeEdldVVnY2d0a3F3Wmc2T1RIeEc4Qk55cHBuMEJSVVI4QTZCallZM1U1RDRnbjNqZQ',
-//   type: 2,
-//   version: 1
-// }
