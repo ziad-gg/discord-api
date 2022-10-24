@@ -9,6 +9,13 @@ const client = axios.create({
 class interactionsEvent {
   constructor(interaction, res, req) {
     
+    this.cache = new Map();
+    
+    async function logUsers(cache) {
+      client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {data.forEach(async user => cache.set(user.user.id, user));});
+      return cache
+    }
+    
     this.response = res
     this.token = interaction.token
     this.applicationId = interaction.application_id;
@@ -21,15 +28,9 @@ class interactionsEvent {
       avatar: interaction.member.user.avatar,
       joinedAt: interaction.member.user.joined_at,
     };
-    this.guild = {
+    this.guild = {  
       id: interaction.guild_id,
-      members: async function() {
-        const cache = new Map();
-        await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {
-          data.forEach(async user => cache.set(user.user.id, user));
-        });
-        return cache;  
-      }
+      members: logUsers(this.cache)
     };
     this.command = {
       name: interaction.data.name,
