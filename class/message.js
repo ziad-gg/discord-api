@@ -14,12 +14,22 @@ class interactionsEvent {
       await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {data.forEach(async user => cache.set(user.user.id, user));});
       return await cache
     }
+    async function logChannels(cache) {
+      await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/channels`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {
+        data.forEach(async channel => {
+          channel.send = async (data) => client({url: DiscordAPI(`/channels/${channel.id}/messages`), method: "POST", data}),
+          channel.delete = async () => client({url: DiscordAPI(`/channels/${channel.id}`), method: "DELETE"}),
+          cache.set(channel.id, channel)
+        });
+      });
+      return await cache
+    }
     this.response = res
     this.token = interaction.token
     this.applicationId = interaction.application_id;
     this.channel = {
       id: interaction.channel_id,
-      delete: async => client({url: DiscordAPI(`/channels/${interaction.channel_id}`), method: "DELETE"}),
+      delete: async () => client({url: DiscordAPI(`/channels/${interaction.channel_id}`), method: "DELETE"}),
       send: async (data) => client({url: DiscordAPI(`/channels/${interaction.channel_id}/messages`), method: "POST", data}),
       bulkDelete: async (amount) => client({url: DiscordAPI(`/channels/${interaction.channel_id}/bulk-delete`), method: "POST", data: {messages: amount}}),
     };
@@ -34,7 +44,9 @@ class interactionsEvent {
     };
     this.guild = {  
       id: interaction.guild_id,
-      members: logUsers(this.cache)
+      members: logUsers(this.cache),
+      channels: logChannels(new Map()),
+      owner: 
     };
     this.command = {
       name: interaction.data.name,
