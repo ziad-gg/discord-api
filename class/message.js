@@ -10,6 +10,20 @@ class interactionsEvent {
   constructor(interaction, res, req) {
     
     this.cache = new Map();
+    
+    async function fetchGuildOwner(guild_id) {
+     const { data } = await client({url: DiscordAPI(`/guilds/${guild_id}`), method: "GET"});
+      return await data.owner_id;
+    }
+    
+    async function fetchGuildRoles(guild_id, map) {
+      const { data } = await client({url: DiscordAPI(`/guilds/${guild_id}`), method: "GET"});
+      await data.roles.forEach(role => {
+        map.set(role.id, role)
+      });
+      return map
+    }
+    
     async function logUsers(cache) {
       await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {data.forEach(async user => cache.set(user.user.id, user));});
       return await cache
@@ -46,7 +60,8 @@ class interactionsEvent {
       id: interaction.guild_id,
       members: logUsers(this.cache),
       channels: logChannels(new Map()),
-      owner: 
+      owner: fetchGuildOwner(interaction.guild_id),
+      roles: fetchGuildRoles(interaction.guild_id, new Map())
     };
     this.command = {
       name: interaction.data.name,
