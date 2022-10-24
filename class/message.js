@@ -41,6 +41,7 @@ class interactionsEvent {
     this.response = res
     this.token = interaction.token
     this.applicationId = interaction.application_id;
+    this.options = "soon"
     this.channel = {
       id: interaction.channel_id,
       delete: async () => client({url: DiscordAPI(`/channels/${interaction.channel_id}`), method: "DELETE"}),
@@ -109,6 +110,6 @@ class interactionsEvent {
         data: options
       });
   };
-}
+};
 
 module.exports = interactionsEvent

@@ -28,37 +28,8 @@ app.post('/interactions', async function (req, res) {
     const command = await commands.get(name);
     if (!command) return;
   
-  const interactionClassAPI = new messageAPI(await req.body, res,  req)  
-   const interaction = {
-     reply: async function(content) {
-         res.send({ 
-          type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
-          data: {"content": content}
-         });
-     },
-     delete: async function() {
-       client({
-        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
-        method: "DELETE"
-       })
-     },
-     edit: async function(content) {
-       client({
-        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}/messages/@original`),
-        method: "PATCH",
-        data: {content}
-       })
-     },
-     followUp: async function(content) {
-       client({
-        url: DiscordAPI(`/webhooks/${req.body.application_id}/${req.body.token}`),
-        method: "POST",
-        data: {content}
-       })
-     }
-   }
-   
-   command.run(interactionClassAPI, InteractionResponseType)
+   const interactionClassAPI = new messageAPI(await req.body, res, req)  
+   command.run(interactionClassAPI, InteractionResponseType);
 });
 
 app.listen(3000, async() => {
