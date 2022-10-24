@@ -16,12 +16,12 @@ class interactionsEvent {
       return await data.owner_id;
     }
     
-    async function fetchGuildRoles(guild_id, map) {
+    async function fetchGuildRoles(guild_id, cache) {
       const { data } = await client({url: DiscordAPI(`/guilds/${guild_id}`), method: "GET"});
       await data.roles.forEach(role => {
-        map.set(role.id, role)
+        if (!role.managed) cache.set(role.id, role)
       });
-      return map
+      return cache
     }
     
     async function logUsers(cache) {
@@ -51,17 +51,24 @@ class interactionsEvent {
       id:  interaction.member.user.id,
       discriminator: interaction.member.user.discriminator,
       username: interaction.member.user.username,
-      roles: interaction.member.roles,
+      roles: {
+        cache: interaction.member.roles,
+        add: (roleId) => client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members/${interaction.member.user.id}/roles/${roleId}`), method: "PUT"}),
+        remove: (roleId) => client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members/${interaction.member.user.id}/roles/${roleId}`), method: "DELETE"}),
+      },
       avatar: interaction.member.user.avatar,
       joinedAt: interaction.member.user.joined_at,
-      avatarURL: async () => `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png?size=1024`
+      avatarURL: async () => `https://cdn.discordapp.com/avatars/${interaction.member.user.id}/${interaction.member.user.avatar}.png?size=1024`,
     };
     this.guild = {  
       id: interaction.guild_id,
       members: logUsers(this.cache),
       channels: logChannels(new Map()),
       owner: fetchGuildOwner(interaction.guild_id),
-      roles: fetchGuildRoles(interaction.guild_id, new Map())
+      roles: {
+        cache: fetchGuildRoles(interaction.guild_id, new Map()),
+        delete: (roleId) => client({url: DiscordAPI(`/guilds/${interaction.guild_id}/roles/${roleId}`), method: "DELETE"}),
+      }
     };
     this.command = {
       name: interaction.data.name,
@@ -71,6 +78,7 @@ class interactionsEvent {
   };
   
   async reply(options) {
+    if (!options) throw new Error("invalid body text");
      await this.response.send({ 
         type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
         data: options
@@ -85,6 +93,7 @@ class interactionsEvent {
   };
   
  edit(options) {
+       if (!options) throw new Error("invalid body text");
     client({
         url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}/messages/@original`),
         method: "PATCH",
@@ -93,6 +102,7 @@ class interactionsEvent {
   };
   
   followUp(options) {
+        if (!options) throw new Error("invalid body text");
     client({
         url: DiscordAPI(`/webhooks/${this.applicationId}/${this.token}`),
         method: "POST",
