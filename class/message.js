@@ -24,10 +24,11 @@ class interactionsEvent {
     this.guild = {
       id: interaction.guild_id,
       members: async function() {
-        client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET"}).then(({data}) => {
-          console.log(data)
-        })
- 
+        const cache = new Map();
+        await client({url: DiscordAPI(`/guilds/${interaction.guild_id}/members`), method: "GET",  params: { limit: 1000 }  }).then(({data}) => {
+          data.forEach(async user => cache.set(user.user.id, user));
+        });
+        return cache;  
       }
     };
     this.command = {
